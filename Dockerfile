@@ -4,7 +4,7 @@ LABEL maintainer="https://github.com/rapejim"
 
 ENTRYPOINT ["/init"]
 
-ENV HOME="/config"
+ENV HOME="/config" \
     PLEXDRIVE_CONFIG_DIR=".plexdrive" \
     CHANGE_PLEXDRIVE_CONFIG_DIR_OWNERSHIP="true" \
     PLEXDRIVE_MOUNT_POINT="/home/Emby" \
