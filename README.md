@@ -1,2 +1,2 @@
-# emby-plexdrive-docker
-Docker image from Emby official with Plexdrive
+# Docker container for Emby Server and Plexdrive
+Based on Linuxserver Docker container for Emby Server. Plexdrive v.5.1.0
