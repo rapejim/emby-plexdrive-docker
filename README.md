@@ -1,6 +1,6 @@
 # ***Emby Server and Plexdrive 🐳***
 
-<div align="center"><img src="https://raw.githubusercontent.com/rapejim/emby-plexdrive-docker/develop/images/banner.png" width="50%"></div>
+<div align="center"><img src="https://raw.githubusercontent.com/rapejim/emby-plexdrive-docker/master/images/banner.png" width="50%"></div>
 
 Combine the power of **Emby Server** *(hereinafter Emby)* with the media files of your Google Drive account *(or a Team Drive)* mounted it by **Plexdrive**.
 

@@ -7,7 +7,7 @@ name: Publish on Docker & ghcr.io
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * 1'
   push:
     # branches: 
     #   - develop
@@ -61,7 +61,7 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           tags: |
-            type=ref,event=branch
+            latest
           images: |
             ${{ github.repository }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}

@@ -1,4 +1,4 @@
-FROM lscr.io/linuxserver/emby:beta
+FROM lscr.io/linuxserver/emby:latest
 
 LABEL maintainer="https://github.com/rapejim"
 
