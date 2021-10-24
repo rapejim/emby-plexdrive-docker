@@ -111,5 +111,5 @@ Those are not required unless you want to preserve your current folder structure
 
 Tags correspond to those of the official PMS Docker container:
 
-- `develop` — Beta Emby releases - beta linuxserver baseimage.
+- `beta` — Beta Emby releases - beta linuxserver baseimage.
 - `latest` — Stable Emby releases - latest linuxserver baseimage.
