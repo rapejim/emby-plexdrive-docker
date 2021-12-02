@@ -2,7 +2,7 @@
 
 <div align="center"><img src="https://raw.githubusercontent.com/rapejim/emby-plexdrive-docker/develop/images/banner.png" width="50%"></div>
 
-Combine the power of **Emby Server** *(hereinafter Emby)* with the media files of your Google Drive account *(or a Team Drive)* mounted it by **Plexdrive**.
+Combine the power of **Emby Server** *(hereinafter Emby)* with the media files of your Google Drive account *(or a [Shared Drive](https://support.google.com/a/users/answer/9310156?hl=en))* mounted it by [**Plexdrive**](https://github.com/plexdrive/plexdrive).
 
 Based on [Linuxserver Emby image for Docker](https://fleet.linuxserver.io/image?name=linuxserver/emby) and installed inside [Plexdrive v.5.1.0](https://github.com/plexdrive/plexdrive)<br>
 *Inspired on my other repository https://github.com/rapejim/pms-plexdrive-docker.* <br>
@@ -26,16 +26,16 @@ Or you can use the configuration files from a previous plexdrive installation (t
 ## ***Example run commands***
 ---
 
-### **Minimal** example run command *(host network)*:
+##### Command line host network
 
-```
-docker run --name Emby -d \
+```bash
+docker run --name emby -d \
     --net=host \
+    -e TZ="Europe/Madrid" \
     -e PUID=${UID} \
     -e PGID=$(id -g) \
-    -e TZ="Europe/Madrid" \
-    -v /docker/emby-plexdrive/config:/config \
-    -v /docker/emby-plexdrive/transcode:/transcode \
+    -v /docker/emby/config:/config \
+    # -v /opt/vc/lib:/opt/vc/lib \ # Optional
     --privileged \
     --cap-add MKNOD \
     --cap-add SYS_ADMIN \
@@ -43,20 +43,20 @@ docker run --name Emby -d \
     --restart=unless-stopped \
     rapejim/emby-plexdrive-docker
 ```
-***NOTE:*** *You must replace `Europe/Madrid` for your time zone and `/docker/emby-plexdrive/...` for your own path (if not use this folder structure). If you have config files (`config.json` and `token.json`) from previous installation of plexdrive, place it on `/docker/emby-plexdrive/config/.plexdrive` folder.* 
-<br>
-<br>
-<br>
 
-### **Advanced** example run command *(bridge network)*:
+##### Command line bridge network
 
-```
-docker run --name Emby -h Emby -d \
-    -p 8096:8096 \
+```bash
+docker run --name emby -h Emby -d \
+    -p 8096:8096/tcp \
+    # -p 8920:8920/tcp \ # Optional HTTPS
+    # -p 1900:1900/udp \ # Optional DLNA
+    # -p 7359:7359/udp \ # Optional LAN discovery
+    -e TZ="Europe/Madrid" \
     -e PUID=${UID} \
     -e PGID=$(id -g) \
-    -e TZ="Europe/Madrid" \
-    -v /docker/emby-plexdrive/config:/config \
+    -v /docker/emby/config:/config \
+    # -v /opt/vc/lib:/opt/vc/lib \ # Optional
     --privileged \
     --cap-add MKNOD \
     --cap-add SYS_ADMIN \
@@ -64,7 +64,68 @@ docker run --name Emby -h Emby -d \
     --restart=unless-stopped \
     rapejim/emby-plexdrive-docker
 ```
-***NOTE:*** *You must replace `Europe/Madrid` for your time zone and `/docker/emby-plexdrive/...` for your own path (if not use this folder structure). If you have config files (`config.json` and `token.json`) from previous installation of plexdrive, place it on `/docker/emby-plexdrive/config/.plexdrive` folder.*
+
+
+
+##### Docker-compose host network
+
+```yaml
+version: '3.5'
+services:
+  emby:
+    container_name: emby
+    image: rapejim/emby-plexdrive-docker # https://hub.docker.com/r/rapejim/emby-plexdrive-docker
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    volumes:
+      - /docker/emby/config:/config
+      # - /opt/vc/lib:/opt/vc/lib # Optional
+    environment:
+      TZ: Europe/Madrid
+      PUID: '1000'
+      PGID: '1000'
+    cap_add:
+      - MKNOD
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse"
+```
+
+##### Docker-compose bridge network
+
+```yaml
+version: '3.5'
+services:
+  emby:
+    container_name: emby
+    hostname: Emby
+    image: rapejim/emby-plexdrive-docker # https://hub.docker.com/r/rapejim/emby-plexdrive-docker
+    restart: unless-stopped
+    privileged: true
+    network_mode: bridge
+    ports:
+      - 8096:8096
+    #   - 8920:8920 # Optional HTTPS
+    #   - 7359:7359/udp # Optional LAN discovery
+    #   - 1900:1900/udp # Optional DLNA
+    volumes:
+      - /docker/emby/config:/config
+      # - /opt/vc/lib:/opt/vc/lib # Optional
+    environment:
+      TZ: Europe/Madrid
+      PUID: '1000'
+      PGID: '1000'
+    cap_add:
+      - MKNOD
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse"
+```
+
+
+
+***NOTE:*** *You must replace `Europe/Madrid` for your time zone and `/docker/emby-plexdrive/...` for your own path (if not use this folder structure). If you have config files (`config.json` and `token.json`) from previous installation of plexdrive, place it on `/docker/emby-plexdrive/config/.plexdrive` folder before.*
 <br>
 <br>
 <br>
@@ -76,7 +137,7 @@ On the first run of container (without config files of previous installation) yo
 plexdrive mount -c ${HOME}/${PLEXDRIVE_CONFIG_DIR} --cache-file=${HOME}/${PLEXDRIVE_CONFIG_DIR}/cache.bolt -o allow_other ${PLEXDRIVE_MOUNT_POINT} {EXTRA_PARAMS}
 ```
 This command start a config wizzard:
-- It asks you for your `Client ID` and `Client Secret`
+- First, it asks you for your `Client ID` and `Client Secret`
 - Shows you a link to log in using your Google Drive account (which you used to get that `Client ID` and `Client Secret`).
 - The web show you a token that you must copy it and paste on terminal.
 - When you complete it, Plexdrive start caching your Google Drive account files on second plane, no need to wait for Plexdrive to complete its initial cache building process on this console, now you have the `config.json` and `token.json` created and can exit from terminal (*Cntrl + C* and `exit`).
@@ -98,8 +159,8 @@ Those are not required unless you want to preserve your current folder structure
   - `--root-node-id=DCBAqwerty987654321_ASDF123456789` for a mount only the sub directory with id `DCBAqwerty987654321_ASDF123456789`
   - *[... plexdrive documentation for more info ...](https://github.com/plexdrive/plexdrive#usage)*
   -  **IMPORTANT:** *Not allowed "`-v` `--verbosity`", "`-c` `--config`", "`--cache-file`" or "`-o` `--fuse-options`" parameters, because are already used.*
-<br>
-<br>
+  <br>
+  <br>
 
 ***REMEMBER:*** *All options from the Linuxserver Emby container are inherited. [Refer to Linuxserver documentation for more info](https://docs.linuxserver.io/images/docker-emby).*
 <br>
@@ -109,7 +170,7 @@ Those are not required unless you want to preserve your current folder structure
 ## ***Tags***
 ---
 
-Tags correspond to those of the official PMS Docker container:
+Tags correspond to those of the Emby Linuxserver docker image:
 
 - `beta` — Beta Emby releases - beta linuxserver baseimage.
 - `latest` — Stable Emby releases - latest linuxserver baseimage.
