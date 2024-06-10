@@ -2,6 +2,8 @@ FROM lscr.io/linuxserver/emby:latest
 
 LABEL maintainer="https://github.com/rapejim"
 
+ARG PLEXDRIVE_VERSION='5.1.0'
+
 ENTRYPOINT ["/init"]
 
 ENV HOME="/config" \
